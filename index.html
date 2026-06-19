@@ -97,7 +97,12 @@
                         <div class="card card-hero carbon-total-card">
                             <div class="card-header">
                                 <h3>Annual Carbon Footprint</h3>
-                                <span class="badge badge-accent">Calculated</span>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <button class="btn btn-secondary btn-sm" id="btn-export-report" aria-label="Export carbon footprint report" style="padding: 4px 8px;">
+                                        <i data-lucide="download" aria-hidden="true" style="width: 14px; height: 14px;"></i> Export
+                                    </button>
+                                    <span class="badge badge-accent">Calculated</span>
+                                </div>
                             </div>
                             <div class="hero-val-container" aria-live="polite" id="dash-footprint-live-container">
                                 <span class="hero-value" id="dash-total-footprint">0.0</span>

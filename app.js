@@ -512,7 +512,7 @@ function toggleCommitToHabit(actionId) {
 // --- RENDER FUNCTIONS ---
 function renderActionCards(categoryFilter = 'all') {
     const container = document.getElementById('actions-list-container');
-    container.innerHTML = '';
+    container.replaceChildren();
 
     const filtered = categoryFilter === 'all'
         ? GREEN_ACTIONS
@@ -700,7 +700,7 @@ function updateUIElements() {
 
     // 5. Badges
     const badgesContainer = document.getElementById('badges-container');
-    badgesContainer.innerHTML = '';
+    badgesContainer.replaceChildren();
     
     BADGES.forEach(badge => {
         const isUnlocked = userState.unlockedBadges.includes(badge.id);
@@ -1125,7 +1125,7 @@ function renderQuizQuestion() {
     document.getElementById('quiz-bar-fill').style.width = `${progressPercent}%`;
 
     const optionsContainer = document.getElementById('quiz-options-list');
-    optionsContainer.innerHTML = '';
+    optionsContainer.replaceChildren();
 
     qData.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
@@ -1232,9 +1232,92 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.nav-btn[data-tab="dashboard"]').click();
     });
 
+    document.getElementById('btn-export-report').addEventListener('click', exportCarbonReport);
+
     // Make functions globally available for inline HTML buttons
     window.logGreenAction = logGreenAction;
     window.toggleCommitToHabit = toggleCommitToHabit;
 
     updateUIElements();
 });
+
+/**
+ * Generates and downloads a custom text report of the user's carbon footprint progress.
+ */
+function exportCarbonReport() {
+    let report = "";
+    report += "==================================================\n";
+    report += "             CARBONPULSE PERSONAL REPORT          \n";
+    report += "==================================================\n\n";
+    report += `Generated On: ${new Date().toLocaleString()}\n`;
+    report += `User Level: ${userState.level}\n`;
+    report += `XP Progress: ${userState.xp} XP\n`;
+    report += `Current Daily Streak: ${userState.streak} days\n\n`;
+
+    report += "--------------------------------------------------\n";
+    report += "              CARBON FOOTPRINT BREAKDOWN          \n";
+    report += "--------------------------------------------------\n";
+    if (userState.hasCompletedCalculator) {
+        report += `Total Footprint: ${userState.carbonFootprint.total.toFixed(2)} tonnes CO2e / year\n`;
+        report += ` - Travel: ${userState.carbonFootprint.travel.toFixed(2)} tonnes CO2e\n`;
+        report += ` - Energy: ${userState.carbonFootprint.energy.toFixed(2)} tonnes CO2e\n`;
+        report += ` - Diet: ${userState.carbonFootprint.diet.toFixed(2)} tonnes CO2e\n`;
+        report += ` - Waste: ${userState.carbonFootprint.waste.toFixed(2)} tonnes CO2e\n\n`;
+        report += `Comparison:\n`;
+        report += ` - Global Average: 4.50 tonnes CO2e / year\n`;
+        report += ` - Sustainable Paris Target: 2.00 tonnes CO2e / year\n`;
+    } else {
+        report += "No footprint calculated yet. Please fill in the onboarding calculator.\n";
+    }
+    report += "\n";
+
+    report += "--------------------------------------------------\n";
+    report += "                 COMMITTED HABITS                 \n";
+    report += "--------------------------------------------------\n";
+    const habits = Object.keys(userState.committedHabits).filter(k => userState.committedHabits[k]);
+    if (habits.length > 0) {
+        habits.forEach(hId => {
+            const act = GREEN_ACTIONS.find(a => a.id === hId);
+            if (act) {
+                report += ` [x] ${act.title} (Saves ${act.saving} kg CO2e)\n`;
+            }
+        });
+    } else {
+        report += "No habits committed to yet.\n";
+    }
+    report += "\n";
+
+    report += "--------------------------------------------------\n";
+    report += "                LOGGED ACTIONS HISTORY            \n";
+    report += "--------------------------------------------------\n";
+    if (userState.loggedActions.length > 0) {
+        const summary = {};
+        userState.loggedActions.forEach(act => {
+            summary[act.id] = (summary[act.id] || 0) + act.carbonSaved;
+        });
+
+        for (const actId in summary) {
+            const act = GREEN_ACTIONS.find(a => a.id === actId);
+            if (act) {
+                const count = userState.loggedActions.filter(x => x.id === actId).length;
+                report += ` - ${act.title}: logged ${count} times (Saved ${summary[actId].toFixed(1)} kg CO2e)\n`;
+            }
+        }
+    } else {
+        report += "No actions logged yet. Start logging actions in the Action Hub!\n";
+    }
+    report += "\n";
+
+    report += "==================================================\n";
+    report += "Thank you for using CarbonPulse to reduce your impact!\n";
+    report += "==================================================\n";
+
+    const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "carbonpulse_report.txt";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("Carbon Report Exported!");
+}
