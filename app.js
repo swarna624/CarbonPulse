@@ -255,26 +255,30 @@ let breakdownChartInstance = null;
 // --- CARBON CALCULATIONS ---
 function computeFootprint(data) {
     // 1. Travel Emissions
-    let mileage = Number(data.carDist) || 0;
+    let mileage = Math.max(0, Number(data.carDist) || 0);
     if (data.carDistUnit === 'km') {
         mileage = mileage * 0.621371; // convert to miles
     }
     const carFactor = EMISSION_FACTORS.car[data.carType] || EMISSION_FACTORS.car['petrol-medium'];
     const travelCar = mileage * carFactor;
     
-    const travelTransit = (Number(data.transitHours) || 0) * EMISSION_FACTORS.transitPerHourWeekly;
-    const travelFlights = (Number(data.flights) || 0) * EMISSION_FACTORS.flightPerHour;
+    const transitHours = Math.max(0, Number(data.transitHours) || 0);
+    const travelTransit = transitHours * EMISSION_FACTORS.transitPerHourWeekly;
+    
+    const flights = Math.max(0, Number(data.flights) || 0);
+    const travelFlights = flights * EMISSION_FACTORS.flightPerHour;
     
     const travelTotal = travelCar + travelTransit + travelFlights;
 
     // 2. Energy Emissions
-    const occupants = Number(data.housePeople) || 1;
-    const yearlyElecCost = (Number(data.elecBill) || 0) * 12;
+    const occupants = Math.max(1, Number(data.housePeople) || 1);
+    const bill = Math.max(0, Number(data.elecBill) || 0);
+    const yearlyElecCost = bill * 12;
     const yearlyKWh = yearlyElecCost / EMISSION_FACTORS.elecCostPerKWh;
     const gridFactor = data.renewables ? EMISSION_FACTORS.elecGreenFactor : EMISSION_FACTORS.elecGridFactor;
     
     const energyElectricity = (yearlyKWh * gridFactor) / occupants;
-    const energyHeating = EMISSION_FACTORS.heating[data.heatingFuel] / occupants;
+    const energyHeating = (EMISSION_FACTORS.heating[data.heatingFuel] || 0.1) / occupants;
     
     const energyTotal = energyElectricity + energyHeating;
 
@@ -473,21 +477,13 @@ function logGreenAction(actionId) {
 
 function triggerFloatingText(saving) {
     const floatEl = document.createElement('div');
-    floatEl.innerText = `-${saving.toFixed(1)} kg CO₂`;
-    floatEl.style.position = 'fixed';
-    floatEl.style.bottom = '50px';
-    floatEl.style.right = '50px';
-    floatEl.style.color = 'var(--accent)';
-    floatEl.style.fontWeight = 'bold';
-    floatEl.style.fontSize = '1.5rem';
-    floatEl.style.zIndex = '9999';
-    floatEl.style.transition = 'all 1s ease-out';
+    floatEl.textContent = `-${saving.toFixed(1)} kg CO₂`;
+    floatEl.className = 'floating-indicator';
     
     document.body.appendChild(floatEl);
     
     setTimeout(() => {
-        floatEl.style.transform = 'translateY(-120px)';
-        floatEl.style.opacity = '0';
+        floatEl.classList.add('animate');
     }, 50);
 
     setTimeout(() => {
@@ -581,7 +577,7 @@ function renderActionCards(categoryFilter = 'all') {
                 indicator.appendChild(document.createTextNode(' Committed'));
             } else {
                 const notCommSpan = document.createElement('span');
-                notCommSpan.style.color = 'var(--text-muted)';
+                notCommSpan.className = 'text-muted';
                 notCommSpan.textContent = 'Not committed';
                 indicator.appendChild(notCommSpan);
             }
@@ -638,27 +634,29 @@ function updateUIElements() {
         
         // Dynamic status text securely using DOM creation to prevent innerHTML issues
         statusMsg.textContent = '';
+        benchUserBar.className = 'benchmark-bar user-bar';
         if (total <= 2.0) {
             const bold = document.createElement('strong');
-            bold.style.color = 'var(--success)';
+            bold.className = 'text-success';
             bold.textContent = 'Fantastic! ';
             statusMsg.appendChild(bold);
             statusMsg.appendChild(document.createTextNode('Your footprint is within the sustainable global target limit.'));
-            benchUserBar.style.background = 'var(--accent-gradient)';
+            benchUserBar.classList.add('status-good');
         } else if (total <= 4.5) {
             statusMsg.appendChild(document.createTextNode('Your footprint is better than the global average, but adjustments can push you under the '));
             const span = document.createElement('span');
-            span.style.color = 'var(--accent)';
+            span.className = 'text-accent';
             span.textContent = '2.0t target';
             statusMsg.appendChild(span);
             statusMsg.appendChild(document.createTextNode('.'));
-            benchUserBar.style.background = 'linear-gradient(90deg, #10b981 0%, #f59e0b 100%)';
+            benchUserBar.classList.add('status-warning');
         } else {
             statusMsg.textContent = 'Your footprint is above average. Try committing to habits or reducing commuting to see immediate improvements.';
-            benchUserBar.style.background = 'linear-gradient(90deg, #f59e0b 0%, #ef4444 100%)';
+            benchUserBar.classList.add('status-danger');
         }
     } else {
         dashVal.innerText = '--';
+        benchUserBar.className = 'benchmark-bar user-bar';
         benchUserBar.style.width = '0%';
         statusMsg.innerText = 'Complete the footprint calculator to see where you stand!';
     }
@@ -743,13 +741,13 @@ function renderBreakdownChart() {
     if (!ctx) return;
 
     if (!userState.hasCompletedCalculator) {
-        ctx.style.display = 'none';
-        placeholder.style.display = 'flex';
+        ctx.classList.add('hidden');
+        placeholder.classList.remove('hidden');
         return;
     }
 
-    ctx.style.display = 'block';
-    placeholder.style.display = 'none';
+    ctx.classList.remove('hidden');
+    placeholder.classList.add('hidden');
 
     const dataVals = [
         userState.carbonFootprint.travel,
@@ -950,11 +948,11 @@ function setupSimulator() {
         if (totalSavings > 0) {
             callout.querySelector('h4').innerText = `Annual Carbon Saving: ${totalSavings.toFixed(2)} tonnes`;
             callout.querySelector('p').innerText = `By committing to these reductions, you'll reduce your impact by ${((totalSavings / base.total) * 100).toFixed(0)}%!`;
-            callout.style.borderColor = 'rgba(0, 240, 170, 0.4)';
+            callout.classList.add('has-savings');
         } else {
             callout.querySelector('h4').innerText = `Adjust the Sliders`;
             callout.querySelector('p').innerText = `Slide handles to forecast how modifications drop your footprint.`;
-            callout.style.borderColor = 'rgba(0, 240, 170, 0.15)';
+            callout.classList.remove('has-savings');
         }
     };
 
@@ -1110,8 +1108,8 @@ function setupQuiz() {
     document.getElementById('btn-quiz-restart').addEventListener('click', () => {
         currentQuizIndex = 0;
         quizScore = 0;
-        document.getElementById('quiz-result-view').style.display = 'none';
-        document.getElementById('quiz-question-view').style.display = 'block';
+        document.getElementById('quiz-result-view').classList.add('hidden');
+        document.getElementById('quiz-question-view').classList.remove('hidden');
         renderQuizQuestion();
     });
 }
@@ -1161,9 +1159,7 @@ function handleQuizAnswer(isCorrect, selectedBtn) {
 
     // Add explanation card dynamically below securely using DOM creation to prevent innerHTML issues
     const expl = document.createElement('div');
-    expl.className = 'metric-status-msg';
-    expl.style.marginTop = '15px';
-    expl.style.borderLeftColor = isCorrect ? 'var(--success)' : 'var(--danger)';
+    expl.className = `metric-status-msg quiz-explanation ${isCorrect ? 'correct' : 'incorrect'}`;
     
     const strong = document.createElement('strong');
     strong.textContent = isCorrect ? 'Correct! ' : 'Incorrect. ';
@@ -1184,9 +1180,9 @@ function handleQuizAnswer(isCorrect, selectedBtn) {
 }
 
 function showQuizResults() {
-    document.getElementById('quiz-question-view').style.display = 'none';
+    document.getElementById('quiz-question-view').classList.add('hidden');
     const resultView = document.getElementById('quiz-result-view');
-    resultView.style.display = 'block';
+    resultView.classList.remove('hidden');
     
     document.getElementById('quiz-score').innerText = quizScore;
     

@@ -58,9 +58,9 @@
                     <div class="profile-badge">Level <span id="user-level">1</span></div>
                 </div>
                 <div class="xp-bar-container">
-                    <div class="xp-bar" id="xp-progress" style="width: 20%;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" aria-label="XP level progress"></div>
+                    <div class="xp-bar" id="xp-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="XP level progress"></div>
                 </div>
-                <div class="xp-text"><span id="current-xp">20</span> / <span id="next-level-xp">100</span> XP</div>
+                <div class="xp-text"><span id="current-xp">0</span> / <span id="next-level-xp">100</span> XP</div>
             </div>
         </aside>
 
@@ -97,9 +97,9 @@
                         <div class="card card-hero carbon-total-card">
                             <div class="card-header">
                                 <h3>Annual Carbon Footprint</h3>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <button class="btn btn-secondary btn-sm" id="btn-export-report" aria-label="Export carbon footprint report" style="padding: 4px 8px;">
-                                        <i data-lucide="download" aria-hidden="true" style="width: 14px; height: 14px;"></i> Export
+                                <div class="card-header-actions">
+                                    <button class="btn btn-secondary btn-sm" id="btn-export-report" aria-label="Export carbon footprint report">
+                                        <i data-lucide="download" aria-hidden="true"></i> Export
                                     </button>
                                     <span class="badge badge-accent">Calculated</span>
                                 </div>
@@ -111,9 +111,9 @@
                             
                             <div class="footprint-benchmark">
                                 <div class="benchmark-bar-container" role="img" id="bench-bar-desc" aria-label="Footprint benchmark comparison bar. Left marker is Paris target (2.0t). Middle marker is Global average (4.5t).">
-                                    <div class="benchmark-bar user-bar" id="bench-user-bar" style="width: 0%;"></div>
-                                    <div class="benchmark-marker target-marker" style="left: 20%;" title="Paris Target (2.0t)"></div>
-                                    <div class="benchmark-marker global-marker" style="left: 45%;" title="Global Average (4.5t)"></div>
+                                    <div class="benchmark-bar user-bar" id="bench-user-bar"></div>
+                                    <div class="benchmark-marker target-marker" title="Paris Target (2.0t)"></div>
+                                    <div class="benchmark-marker global-marker" title="Global Average (4.5t)"></div>
                                 </div>
                                 <div class="benchmark-labels" aria-hidden="true">
                                     <span>Paris Target: 2.0t</span>
@@ -405,19 +405,19 @@
                             <div class="mini-breakdown-bars" aria-hidden="true">
                                 <div class="mini-bar-item">
                                     <div class="label-row"><span>Transportation</span> <span id="bar-val-travel">0.0t</span></div>
-                                    <div class="bar-bg"><div class="bar-fill travel" id="bar-fill-travel" style="width: 0%"></div></div>
+                                    <div class="bar-bg"><div class="bar-fill travel" id="bar-fill-travel"></div></div>
                                 </div>
                                 <div class="mini-bar-item">
                                     <div class="label-row"><span>Energy & Housing</span> <span id="bar-val-energy">0.0t</span></div>
-                                    <div class="bar-bg"><div class="bar-fill energy" id="bar-fill-energy" style="width: 0%"></div></div>
+                                    <div class="bar-bg"><div class="bar-fill energy" id="bar-fill-energy"></div></div>
                                 </div>
                                 <div class="mini-bar-item">
                                     <div class="label-row"><span>Diet & Food</span> <span id="bar-val-diet">0.0t</span></div>
-                                    <div class="bar-bg"><div class="bar-fill diet" id="bar-fill-diet" style="width: 0%"></div></div>
+                                    <div class="bar-bg"><div class="bar-fill diet" id="bar-fill-diet"></div></div>
                                 </div>
                                 <div class="mini-bar-item">
                                     <div class="label-row"><span>Consumption & Waste</span> <span id="bar-val-waste">0.0t</span></div>
-                                    <div class="bar-bg"><div class="bar-fill waste" id="bar-fill-waste" style="width: 0%"></div></div>
+                                    <div class="bar-bg"><div class="bar-fill waste" id="bar-fill-waste"></div></div>
                                 </div>
                             </div>
 
@@ -597,7 +597,7 @@
                                 <!-- Step 1: Active Question -->
                                 <div id="quiz-question-view">
                                     <div class="quiz-progress-text">Question <span id="quiz-current-num">1</span> of 3</div>
-                                    <div class="quiz-progress-bar"><div id="quiz-bar-fill" style="width: 33%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="33" aria-label="Quiz progress"></div></div>
+                                    <div class="quiz-progress-bar"><div id="quiz-bar-fill" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Quiz progress"></div></div>
                                     
                                     <h4 class="quiz-question" id="quiz-question-text">Which of the following actions typically has the single highest annual carbon saving?</h4>
                                     
@@ -607,7 +607,7 @@
                                 </div>
 
                                 <!-- Step 2: Results view -->
-                                <div id="quiz-result-view" style="display: none;">
+                                <div id="quiz-result-view" class="hidden">
                                     <div class="quiz-success-icon"><i data-lucide="check-circle-2" aria-hidden="true"></i></div>
                                     <h4>Quiz Completed!</h4>
                                     <p class="quiz-score-text">You got <span id="quiz-score">0</span> out of 3 correct!</p>

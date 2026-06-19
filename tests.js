@@ -246,23 +246,72 @@
         assert(false, `Test 10 errored: ${e.message}`);
     }
 
+    // --- TEST 11: Negative/Invalid Calculator Inputs ---
+    try {
+        const negativeData = {
+            carDist: -1200,
+            carDistUnit: 'miles',
+            carType: 'petrol-medium',
+            transitHours: -5,
+            flights: -2,
+            housePeople: 2,
+            elecBill: -100,
+            heatingFuel: 'none',
+            renewables: true,
+            diet: 'vegan',
+            foodWaste: 'minimal',
+            recycling: 'full',
+            shopping: 'minimal'
+        };
+
+        const resultNeg = computeFootprint(negativeData);
+        assert(resultNeg.travel === 0.0, `Test 11: Negative travel inputs default to 0.0t emissions`);
+        assert(resultNeg.energy === 0.05, `Test 11: Negative electricity bill defaults to 0.0t, leaving only shared heating baseline`);
+        assert(resultNeg.total >= 0.1, `Test 11: Negative inputs do not result in overall negative carbon footprint`);
+    } catch (e) {
+        assert(false, `Test 11 errored: ${e.message}`);
+    }
+
+    // --- TEST 12: Invalid Household Occupants ---
+    try {
+        const zeroOccupantsData = {
+            carDist: 0,
+            carDistUnit: 'miles',
+            carType: 'electric',
+            transitHours: 0,
+            flights: 0,
+            housePeople: 0, // invalid occupants
+            elecBill: 100,
+            heatingFuel: 'natural-gas',
+            renewables: false,
+            diet: 'vegan',
+            foodWaste: 'minimal',
+            recycling: 'full',
+            shopping: 'minimal'
+        };
+
+        const negativeOccupantsData = {
+            ...zeroOccupantsData,
+            housePeople: -3 // negative occupants
+        };
+
+        const resZero = computeFootprint(zeroOccupantsData);
+        const resNeg = computeFootprint(negativeOccupantsData);
+        const resOne = computeFootprint({ ...zeroOccupantsData, housePeople: 1 });
+
+        assert(resZero.energy === resOne.energy, `Test 12: Zero occupants defaults to 1 occupant (energy: ${resZero.energy}t)`);
+        assert(resNeg.energy === resOne.energy, `Test 12: Negative occupants defaults to 1 occupant (energy: ${resNeg.energy}t)`);
+    } catch (e) {
+        assert(false, `Test 12 errored: ${e.message}`);
+    }
+
     // --- PRINT SUMMARY ---
     console.log(`%c TEST RUN SUMMARY: ${passedTests} passed, ${failedTests} failed `, 
         `color: white; background: ${failedTests === 0 ? '#10b981' : '#ef4444'}; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-top: 10px;`);
 
     if (failedTests === 0) {
         const testBanner = document.createElement('div');
-        testBanner.style.position = 'fixed';
-        testBanner.style.top = '10px';
-        testBanner.style.left = '50%';
-        testBanner.style.transform = 'translateX(-50%)';
-        testBanner.style.backgroundColor = 'rgba(16, 185, 129, 0.95)';
-        testBanner.style.color = '#000';
-        testBanner.style.padding = '8px 16px';
-        testBanner.style.borderRadius = '20px';
-        testBanner.style.fontSize = '0.8rem';
-        testBanner.style.fontWeight = 'bold';
-        testBanner.style.zIndex = '99999';
+        testBanner.className = 'test-banner';
         testBanner.innerText = `✔ Automated Test Suite Passed (${passedTests}/${passedTests})`;
         document.body.appendChild(testBanner);
         setTimeout(() => testBanner.remove(), 5000);
