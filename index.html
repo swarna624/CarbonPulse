@@ -18,54 +18,54 @@
 <body class="dark-theme">
     <div class="app-container">
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" role="complementary" aria-label="Sidebar navigation">
             <div class="brand">
                 <div class="logo-icon">
-                    <i data-lucide="leaf"></i>
+                    <i data-lucide="leaf" aria-hidden="true"></i>
                 </div>
                 <span class="brand-name">CarbonPulse</span>
             </div>
             
-            <nav class="nav-menu">
-                <button class="nav-btn active" data-tab="dashboard">
-                    <i data-lucide="layout-dashboard"></i>
+            <nav class="nav-menu" role="tablist" aria-label="Application sections">
+                <button class="nav-btn active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="tab-dashboard" id="tab-btn-dashboard">
+                    <i data-lucide="layout-dashboard" aria-hidden="true"></i>
                     <span>Dashboard</span>
                 </button>
-                <button class="nav-btn" data-tab="calculator">
-                    <i data-lucide="calculator"></i>
+                <button class="nav-btn" data-tab="calculator" role="tab" aria-selected="false" aria-controls="tab-calculator" id="tab-btn-calculator">
+                    <i data-lucide="calculator" aria-hidden="true"></i>
                     <span>Footprint Calculator</span>
                 </button>
-                <button class="nav-btn" data-tab="actions">
-                    <i data-lucide="zap"></i>
+                <button class="nav-btn" data-tab="actions" role="tab" aria-selected="false" aria-controls="tab-actions" id="tab-btn-actions">
+                    <i data-lucide="zap" aria-hidden="true"></i>
                     <span>Action Hub</span>
                 </button>
-                <button class="nav-btn" data-tab="simulator">
-                    <i data-lucide="sliders"></i>
+                <button class="nav-btn" data-tab="simulator" role="tab" aria-selected="false" aria-controls="tab-simulator" id="tab-btn-simulator">
+                    <i data-lucide="sliders" aria-hidden="true"></i>
                     <span>What-If Simulator</span>
                 </button>
-                <button class="nav-btn" data-tab="insights">
-                    <i data-lucide="book-open"></i>
+                <button class="nav-btn" data-tab="insights" role="tab" aria-selected="false" aria-controls="tab-insights" id="tab-btn-insights">
+                    <i data-lucide="book-open" aria-hidden="true"></i>
                     <span>Insights & Quiz</span>
                 </button>
             </nav>
 
             <div class="user-profile-summary">
                 <div class="profile-avatar">
-                    <i data-lucide="user"></i>
+                    <i data-lucide="user" aria-hidden="true"></i>
                 </div>
                 <div class="profile-info">
                     <div class="profile-name">Eco Explorer</div>
                     <div class="profile-badge">Level <span id="user-level">1</span></div>
                 </div>
                 <div class="xp-bar-container">
-                    <div class="xp-bar" id="xp-progress" style="width: 20%;"></div>
+                    <div class="xp-bar" id="xp-progress" style="width: 20%;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" aria-label="XP level progress"></div>
                 </div>
                 <div class="xp-text"><span id="current-xp">20</span> / <span id="next-level-xp">100</span> XP</div>
             </div>
         </aside>
 
         <!-- Main Content Area -->
-        <main class="main-content">
+        <main class="main-content" role="main">
             <!-- Header -->
             <header class="top-header">
                 <div class="header-title">
@@ -74,12 +74,12 @@
                 </div>
                 
                 <div class="header-stats">
-                    <div class="stat-pill" title="Daily streak for logging actions">
-                        <i data-lucide="flame" class="streak-icon"></i>
+                    <div class="stat-pill" title="Daily streak for logging actions" tabindex="0">
+                        <i data-lucide="flame" class="streak-icon" aria-hidden="true"></i>
                         <span id="stat-streak">0</span> day streak
                     </div>
-                    <div class="stat-pill" title="Total carbon saved since joining">
-                        <i data-lucide="trending-down" class="saved-icon"></i>
+                    <div class="stat-pill" title="Total carbon saved since joining" tabindex="0">
+                        <i data-lucide="trending-down" class="saved-icon" aria-hidden="true"></i>
                         <span id="stat-total-saved">0</span> kg CO₂e saved
                     </div>
                 </div>
@@ -89,7 +89,7 @@
             <div class="content-panel">
                 
                 <!-- TAB 1: DASHBOARD -->
-                <section id="tab-dashboard" class="tab-panel active">
+                <section id="tab-dashboard" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-dashboard" tabindex="0">
                     <!-- Dashboard Grid -->
                     <div class="dashboard-grid">
                         
@@ -99,24 +99,24 @@
                                 <h3>Annual Carbon Footprint</h3>
                                 <span class="badge badge-accent">Calculated</span>
                             </div>
-                            <div class="hero-val-container">
+                            <div class="hero-val-container" aria-live="polite" id="dash-footprint-live-container">
                                 <span class="hero-value" id="dash-total-footprint">0.0</span>
                                 <span class="hero-unit">tonnes CO₂e / yr</span>
                             </div>
                             
                             <div class="footprint-benchmark">
-                                <div class="benchmark-bar-container">
+                                <div class="benchmark-bar-container" role="img" id="bench-bar-desc" aria-label="Footprint benchmark comparison bar. Left marker is Paris target (2.0t). Middle marker is Global average (4.5t).">
                                     <div class="benchmark-bar user-bar" id="bench-user-bar" style="width: 0%;"></div>
                                     <div class="benchmark-marker target-marker" style="left: 20%;" title="Paris Target (2.0t)"></div>
                                     <div class="benchmark-marker global-marker" style="left: 45%;" title="Global Average (4.5t)"></div>
                                 </div>
-                                <div class="benchmark-labels">
+                                <div class="benchmark-labels" aria-hidden="true">
                                     <span>Paris Target: 2.0t</span>
                                     <span>Global Avg: 4.5t</span>
                                     <span class="user-lbl">You</span>
                                 </div>
                             </div>
-                            <div class="metric-status-msg" id="footprint-status-msg">
+                            <div class="metric-status-msg" id="footprint-status-msg" aria-live="polite">
                                 Complete the footprint calculator to see where you stand!
                             </div>
                         </div>
@@ -125,9 +125,9 @@
                         <div class="card chart-card">
                             <h3>Footprint Breakdown</h3>
                             <div class="chart-container">
-                                <canvas id="breakdownChart"></canvas>
+                                <canvas id="breakdownChart" role="img" aria-label="Carbon footprint category breakdown chart"></canvas>
                                 <div class="chart-placeholder" id="chart-placeholder-text">
-                                    <i data-lucide="pie-chart"></i>
+                                    <i data-lucide="pie-chart" aria-hidden="true"></i>
                                     <p>Please enter details in the calculator to generate your footprint analysis.</p>
                                 </div>
                             </div>
@@ -138,18 +138,18 @@
                             <h3>Monthly Carbon Reduction Goal</h3>
                             <p class="card-desc">Log green habits to reach your monthly carbon reduction target.</p>
                             <div class="goal-progress-container">
-                                <div class="circular-progress-wrapper">
-                                    <svg class="progress-ring" width="120" height="120">
+                                <div class="circular-progress-wrapper" role="img" id="goal-progress-wrapper" aria-label="Goal progress circular meter">
+                                    <svg class="progress-ring" width="120" height="120" aria-hidden="true">
                                         <circle class="progress-ring__circle-bg" stroke="#1f2c26" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
                                         <circle class="progress-ring__circle" id="goal-progress-circle" stroke="#00f0aa" stroke-width="8" fill="transparent" r="50" cx="60" cy="60" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
                                     </svg>
-                                    <div class="progress-text-overlay">
+                                    <div class="progress-text-overlay" aria-hidden="true">
                                         <span class="percentage" id="goal-percent-text">0%</span>
                                         <span class="sub-label">of monthly goal</span>
                                     </div>
                                 </div>
                                 <div class="goal-details">
-                                    <div class="goal-metric">
+                                    <div class="goal-metric" aria-live="polite">
                                         <span class="label">Monthly Saved:</span>
                                         <span class="value" id="goal-current-saved">0 kg</span>
                                     </div>
@@ -157,8 +157,8 @@
                                         <span class="label">Target:</span>
                                         <span class="value">50 kg CO₂e</span>
                                     </div>
-                                    <button class="btn btn-secondary btn-sm" id="btn-quick-log">
-                                        <i data-lucide="plus"></i> Log Today's Commute
+                                    <button class="btn btn-secondary btn-sm" id="btn-quick-log" aria-label="Log today's active commute transit">
+                                        <i data-lucide="plus" aria-hidden="true"></i> Log Today's Commute
                                     </button>
                                 </div>
                             </div>
@@ -168,20 +168,20 @@
                         <div class="card achievements-card">
                             <div class="card-header">
                                 <h3>Recent Achievements</h3>
-                                <button class="btn btn-text" id="btn-view-all-badges">View All</button>
+                                <button class="btn btn-text" id="btn-view-all-badges" aria-label="View all badges and achievements">View All</button>
                             </div>
-                            <div class="badges-row" id="badges-container">
+                            <div class="badges-row" id="badges-container" aria-label="List of earned achievement badges">
                                 <!-- Dynamic Badges Loaded by JS -->
-                                <div class="badge-item locked">
-                                    <div class="badge-icon"><i data-lucide="award"></i></div>
+                                <div class="badge-item locked" tabindex="0" title="First Steps">
+                                    <div class="badge-icon"><i data-lucide="award" aria-hidden="true"></i></div>
                                     <div class="badge-title">First Steps</div>
                                 </div>
-                                <div class="badge-item locked">
-                                    <div class="badge-icon"><i data-lucide="bike"></i></div>
+                                <div class="badge-item locked" tabindex="0" title="Eco Commuter">
+                                    <div class="badge-icon"><i data-lucide="bike" aria-hidden="true"></i></div>
                                     <div class="badge-title">Eco Commuter</div>
                                 </div>
-                                <div class="badge-item locked">
-                                    <div class="badge-icon"><i data-lucide="utensils"></i></div>
+                                <div class="badge-item locked" tabindex="0" title="Green Diet">
+                                    <div class="badge-icon"><i data-lucide="utensils" aria-hidden="true"></i></div>
                                     <div class="badge-title">Green Diet</div>
                                 </div>
                             </div>
@@ -191,13 +191,13 @@
                 </section>
 
                 <!-- TAB 2: CALCULATOR -->
-                <section id="tab-calculator" class="tab-panel">
+                <section id="tab-calculator" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-calculator" tabindex="0">
                     <div class="calculator-container">
                         <!-- Left pane: Input Forms (multi-step style) -->
                         <div class="calc-steps-card card">
                             <!-- Step indicators -->
-                            <div class="step-indicator-bar">
-                                <div class="step-node active" data-step="1">
+                            <div class="step-indicator-bar" role="navigation" aria-label="Calculator steps progress">
+                                <div class="step-node active" data-step="1" aria-current="step">
                                     <span class="node-num">1</span>
                                     <span class="node-label">Travel</span>
                                 </div>
@@ -224,7 +224,7 @@
                                     <label for="calc-car-dist">Private Car Mileage (yearly)</label>
                                     <div class="input-with-unit">
                                         <input type="number" id="calc-car-dist" min="0" value="5000" placeholder="0">
-                                        <select id="calc-car-dist-unit">
+                                        <select id="calc-car-dist-unit" aria-label="Distance unit">
                                             <option value="miles">miles / yr</option>
                                             <option value="km">km / yr</option>
                                         </select>
@@ -291,9 +291,9 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="checkbox-container">
+                                    <label class="checkbox-container" for="calc-renewables">
                                         <input type="checkbox" id="calc-renewables">
-                                        <span class="checkmark"></span>
+                                        <span class="checkmark" aria-hidden="true"></span>
                                         Our household uses 100% Green / Renewable electricity tariff
                                     </label>
                                 </div>
@@ -305,38 +305,38 @@
                                 <p class="step-desc">Food production, transport, and packaging accounts for roughly 25% of global greenhouse emissions.</p>
 
                                 <div class="form-group">
-                                    <label>Which profile best describes your diet?</label>
-                                    <div class="radio-card-grid">
+                                    <label id="diet-profile-label">Which profile best describes your diet?</label>
+                                    <div class="radio-card-grid" role="radiogroup" aria-labelledby="diet-profile-label">
                                         <label class="radio-card">
-                                            <input type="radio" name="calc-diet" value="heavy-meat" checked>
+                                            <input type="radio" name="calc-diet" value="heavy-meat" checked aria-describedby="diet-desc-heavy">
                                             <div class="radio-card-content">
-                                                <i class="radio-icon" data-lucide="chef-hat"></i>
+                                                <i class="radio-icon" data-lucide="chef-hat" aria-hidden="true"></i>
                                                 <div class="radio-title">Meat Lover</div>
-                                                <div class="radio-desc">Regular red meat consumption (beef, pork, lamb).</div>
+                                                <div class="radio-desc" id="diet-desc-heavy">Regular red meat consumption (beef, pork, lamb).</div>
                                             </div>
                                         </label>
                                         <label class="radio-card">
-                                            <input type="radio" name="calc-diet" value="medium-meat">
+                                            <input type="radio" name="calc-diet" value="medium-meat" aria-describedby="diet-desc-med">
                                             <div class="radio-card-content">
-                                                <i class="radio-icon" data-lucide="egg"></i>
+                                                <i class="radio-icon" data-lucide="egg" aria-hidden="true"></i>
                                                 <div class="radio-title">Average Diet</div>
-                                                <div class="radio-desc">Some poultry, fish, and occasional red meat.</div>
+                                                <div class="radio-desc" id="diet-desc-med">Some poultry, fish, and occasional red meat.</div>
                                             </div>
                                         </label>
                                         <label class="radio-card">
-                                            <input type="radio" name="calc-diet" value="vegetarian">
+                                            <input type="radio" name="calc-diet" value="vegetarian" aria-describedby="diet-desc-veg">
                                             <div class="radio-card-content">
-                                                <i class="radio-icon" data-lucide="carrot"></i>
+                                                <i class="radio-icon" data-lucide="carrot" aria-hidden="true"></i>
                                                 <div class="radio-title">Vegetarian</div>
-                                                <div class="radio-desc">No meat or fish, but consumes dairy and eggs.</div>
+                                                <div class="radio-desc" id="diet-desc-veg">No meat or fish, but consumes dairy and eggs.</div>
                                             </div>
                                         </label>
                                         <label class="radio-card">
-                                            <input type="radio" name="calc-diet" value="vegan">
+                                            <input type="radio" name="calc-diet" value="vegan" aria-describedby="diet-desc-vegan">
                                             <div class="radio-card-content">
-                                                <i class="radio-icon" data-lucide="sprout"></i>
+                                                <i class="radio-icon" data-lucide="sprout" aria-hidden="true"></i>
                                                 <div class="radio-title">Vegan</div>
-                                                <div class="radio-desc">Strictly plant-based diet, no animal products.</div>
+                                                <div class="radio-desc" id="diet-desc-vegan">Strictly plant-based diet, no animal products.</div>
                                             </div>
                                         </label>
                                     </div>
@@ -358,7 +358,7 @@
                                 <p class="step-desc">The products we buy, how we recycle, and what goes to landfill make up the final slice of our footprint.</p>
 
                                 <div class="form-group">
-                                    <label>What is your recycling habit?</label>
+                                    <label for="calc-recycling">What is your recycling habit?</label>
                                     <select id="calc-recycling">
                                         <option value="full">Recycle everything possible (paper, plastic, glass, metal)</option>
                                         <option value="partial" selected>Recycle partially (mostly paper and cardboard)</option>
@@ -378,17 +378,17 @@
 
                             <!-- Form Action Buttons -->
                             <div class="calc-actions">
-                                <button class="btn btn-secondary btn-icon-left" id="btn-calc-prev" disabled>
-                                    <i data-lucide="arrow-left"></i> Previous
+                                <button class="btn btn-secondary btn-icon-left" id="btn-calc-prev" disabled aria-label="Previous step">
+                                    <i data-lucide="arrow-left" aria-hidden="true"></i> Previous
                                 </button>
-                                <button class="btn btn-primary btn-icon-right" id="btn-calc-next">
-                                    Next <i data-lucide="arrow-right"></i>
+                                <button class="btn btn-primary btn-icon-right" id="btn-calc-next" aria-label="Next step">
+                                    Next <i data-lucide="arrow-right" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Right pane: Real-time Live Result Card -->
-                        <div class="calc-live-result card">
+                        <div class="calc-live-result card" aria-live="polite">
                             <h3>Live Footprint Estimator</h3>
                             <p class="live-subtitle">Values recalculate instantly as you modify inputs.</p>
                             
@@ -397,7 +397,7 @@
                                 <span class="live-unit">tonnes CO₂e / year</span>
                             </div>
 
-                            <div class="mini-breakdown-bars">
+                            <div class="mini-breakdown-bars" aria-hidden="true">
                                 <div class="mini-bar-item">
                                     <div class="label-row"><span>Transportation</span> <span id="bar-val-travel">0.0t</span></div>
                                     <div class="bar-bg"><div class="bar-fill travel" id="bar-fill-travel" style="width: 0%"></div></div>
@@ -417,8 +417,8 @@
                             </div>
 
                             <div class="calculator-save-banner">
-                                <button class="btn btn-success btn-full" id="btn-save-calculator">
-                                    <i data-lucide="save"></i> Save & Update Dashboard
+                                <button class="btn btn-success btn-full" id="btn-save-calculator" aria-label="Save calculator inputs and update main dashboard">
+                                    <i data-lucide="save" aria-hidden="true"></i> Save & Update Dashboard
                                 </button>
                             </div>
                         </div>
@@ -426,29 +426,29 @@
                 </section>
 
                 <!-- TAB 3: ACTIONS -->
-                <section id="tab-actions" class="tab-panel">
+                <section id="tab-actions" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-actions" tabindex="0">
                     <div class="actions-header">
                         <h2>Personalized Green Actions</h2>
                         <p class="subtitle">Complete simple daily actions or commit to long-term habits to build your streak and level up.</p>
                     </div>
 
                     <!-- Category Filters -->
-                    <div class="filter-bar">
-                        <button class="filter-btn active" data-filter="all">All Actions</button>
-                        <button class="filter-btn" data-filter="travel">Travel</button>
-                        <button class="filter-btn" data-filter="energy">Energy</button>
-                        <button class="filter-btn" data-filter="diet">Food</button>
-                        <button class="filter-btn" data-filter="waste">Waste</button>
+                    <div class="filter-bar" role="tablist" aria-label="Action categories">
+                        <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true" id="act-filter-all">All Actions</button>
+                        <button class="filter-btn" data-filter="travel" role="tab" aria-selected="false" id="act-filter-travel">Travel</button>
+                        <button class="filter-btn" data-filter="energy" role="tab" aria-selected="false" id="act-filter-energy">Energy</button>
+                        <button class="filter-btn" data-filter="diet" role="tab" aria-selected="false" id="act-filter-diet">Food</button>
+                        <button class="filter-btn" data-filter="waste" role="tab" aria-selected="false" id="act-filter-waste">Waste</button>
                     </div>
 
                     <!-- Actions Grid -->
-                    <div class="actions-grid" id="actions-list-container">
+                    <div class="actions-grid" id="actions-list-container" aria-label="Available ecological actions">
                         <!-- Dynamic cards generated by JS -->
                     </div>
                 </section>
 
                 <!-- TAB 4: SIMULATOR -->
-                <section id="tab-simulator" class="tab-panel">
+                <section id="tab-simulator" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-simulator" tabindex="0">
                     <div class="simulator-layout">
                         <!-- Simulation Controls -->
                         <div class="card sim-controls-card">
@@ -457,38 +457,38 @@
                             
                             <div class="sim-slider-group">
                                 <div class="slider-header">
-                                    <span class="slider-title"><i data-lucide="car"></i> Commute Reduction</span>
+                                    <span class="slider-title"><i data-lucide="car" aria-hidden="true"></i> Commute Reduction</span>
                                     <span class="slider-val" id="sim-val-commute">0% less driving</span>
                                 </div>
-                                <input type="range" class="custom-slider" id="sim-slider-commute" min="0" max="100" value="0">
+                                <input type="range" class="custom-slider" id="sim-slider-commute" min="0" max="100" value="0" aria-label="Commute reduction percentage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0% less driving">
                                 <span class="slider-desc">Commute by carpool, bicycle, walking, or working from home.</span>
                             </div>
 
                             <div class="sim-slider-group">
                                 <div class="slider-header">
-                                    <span class="slider-title"><i data-lucide="carrot"></i> Vegetarian Days</span>
+                                    <span class="slider-title"><i data-lucide="carrot" aria-hidden="true"></i> Vegetarian Days</span>
                                     <span class="slider-val" id="sim-val-meat">0 days / week</span>
                                 </div>
-                                <input type="range" class="custom-slider" id="sim-slider-meat" min="0" max="7" value="0">
+                                <input type="range" class="custom-slider" id="sim-slider-meat" min="0" max="7" value="0" aria-label="Vegetarian days per week" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0" aria-valuetext="0 days per week">
                                 <span class="slider-desc">Replace animal meat with plant-based alternatives.</span>
                             </div>
 
                             <div class="sim-slider-group">
                                 <div class="slider-header">
-                                    <span class="slider-title"><i data-lucide="thermometer"></i> Thermostat Tuning</span>
+                                    <span class="slider-title"><i data-lucide="thermometer" aria-hidden="true"></i> Thermostat Tuning</span>
                                     <span class="slider-val" id="sim-val-thermo">0°C reduction</span>
                                 </div>
-                                <input type="range" class="custom-slider" id="sim-slider-thermo" min="0" max="4" value="0" step="0.5">
+                                <input type="range" class="custom-slider" id="sim-slider-thermo" min="0" max="4" value="0" step="0.5" aria-label="Thermostat temperature reduction in Celsius" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" aria-valuetext="0°C reduction">
                                 <span class="slider-desc">Lower thermostat in winter or raise AC temperature in summer.</span>
                             </div>
 
                             <div class="sim-slider-group">
                                 <div class="slider-header">
-                                    <span class="slider-title"><i data-lucide="plug"></i> Appliance Efficiency</span>
+                                    <span class="slider-title"><i data-lucide="plug" aria-hidden="true"></i> Appliance Efficiency</span>
                                     <span class="slider-val" id="sim-val-appliances">Standard efficiency</span>
                                 </div>
-                                <input type="range" class="custom-slider" id="sim-slider-appliances" min="0" max="2" value="0" step="1">
-                                <div class="slider-ticks-labels">
+                                <input type="range" class="custom-slider" id="sim-slider-appliances" min="0" max="2" value="0" step="1" aria-label="Appliance efficiency level" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0" aria-valuetext="Standard efficiency">
+                                <div class="slider-ticks-labels" aria-hidden="true">
                                     <span>None</span>
                                     <span>LED Bulbs</span>
                                     <span>Energy Star</span>
@@ -501,13 +501,13 @@
                             <h3>Impact Forecast</h3>
                             <p class="subtitle">Calculated based on your current custom profile.</p>
 
-                            <div class="forecast-comparison">
+                            <div class="forecast-comparison" aria-live="polite">
                                 <div class="forecast-box current">
                                     <span class="label">Current Footprint</span>
                                     <span class="value" id="sim-current-val">0.0</span>
                                     <span class="unit">t CO₂e/yr</span>
                                 </div>
-                                <div class="forecast-arrow">
+                                <div class="forecast-arrow" aria-hidden="true">
                                     <i data-lucide="chevrons-right"></i>
                                 </div>
                                 <div class="forecast-box projected">
@@ -517,15 +517,15 @@
                                 </div>
                             </div>
 
-                            <div class="forecast-savings-callout" id="sim-savings-callout">
-                                <div class="callout-icon"><i data-lucide="sparkles"></i></div>
+                            <div class="forecast-savings-callout" id="sim-savings-callout" aria-live="polite">
+                                <div class="callout-icon"><i data-lucide="sparkles" aria-hidden="true"></i></div>
                                 <div class="callout-content">
                                     <h4>Potential Savings</h4>
                                     <p>Adjust the sliders to view potential annual carbon savings.</p>
                                 </div>
                             </div>
 
-                            <div class="forecast-details">
+                            <div class="forecast-details" aria-live="polite">
                                 <div class="forecast-detail-row">
                                     <span>Equates to planting</span>
                                     <strong id="sim-equivalent-trees">0 trees</strong>
@@ -540,40 +540,40 @@
                 </section>
 
                 <!-- TAB 5: INSIGHTS & QUIZ -->
-                <section id="tab-insights" class="tab-panel">
+                <section id="tab-insights" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-insights" tabindex="0">
                     <div class="insights-layout">
                         <!-- Left Pane: Educational Insights -->
                         <div class="insights-articles">
                             <h2>Insights & Guides</h2>
                             <p class="subtitle">Learn about carbon metrics and why these specific changes matter.</p>
                             
-                            <div class="accordion-group">
+                            <div class="accordion-group" role="presentation">
                                 <div class="accordion-item">
-                                    <button class="accordion-trigger">
+                                    <button class="accordion-trigger" aria-expanded="false" aria-controls="accordion-desc-1" id="accordion-trigger-1">
                                         <span>What exactly does "CO₂e" mean?</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </button>
-                                    <div class="accordion-content">
+                                    <div class="accordion-content" id="accordion-desc-1" role="region" aria-labelledby="accordion-trigger-1">
                                         <p>Carbon dioxide equivalent (CO₂e) is a unit used to compare the emissions from various greenhouse gases on the basis of their global warming potential (GWP), by converting amounts of other gases to the equivalent amount of carbon dioxide with the same global warming impact. For instance, methane is 25-28 times more potent than carbon dioxide over a 100-year timescale, so 1 tonne of methane equals 28 tonnes of CO₂e.</p>
                                     </div>
                                 </div>
 
                                 <div class="accordion-item">
-                                    <button class="accordion-trigger">
+                                    <button class="accordion-trigger" aria-expanded="false" aria-controls="accordion-desc-2" id="accordion-trigger-2">
                                         <span>How is my transportation footprint computed?</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </button>
-                                    <div class="accordion-content">
+                                    <div class="accordion-content" id="accordion-desc-2" role="region" aria-labelledby="accordion-trigger-2">
                                         <p>We use standard emission factors derived from environmental agencies (like US EPA and UK DEFRA). Private cars emit varying amounts of CO₂ based on fuel source (e.g., petrol/diesel cars average ~300g per mile, hybrids emit ~180g, and EVs emit ~70-90g depending on the average electric grid emissions of the electricity tariff used to charge them). Flight emissions include radiative forcing (heat trapping in high altitude) which compounds high atmospheric emissions.</p>
                                     </div>
                                 </div>
 
                                 <div class="accordion-item">
-                                    <button class="accordion-trigger">
+                                    <button class="accordion-trigger" aria-expanded="false" aria-controls="accordion-desc-3" id="accordion-trigger-3">
                                         <span>Why is beef footprint so much higher than poultry or vegetables?</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </button>
-                                    <div class="accordion-content">
+                                    <div class="accordion-content" id="accordion-desc-3" role="region" aria-labelledby="accordion-trigger-3">
                                         <p>Beef has a massive carbon footprint due to enteric fermentation (methane produced by cattle digestion), land-use change (deforestation to create pasture), and lower feed conversion efficiency. Producing 1kg of beef results in roughly 60-99kg of CO₂e, whereas 1kg of poultry is around 6kg of CO₂e, and root vegetables/lentils are generally under 1kg of CO₂e.</p>
                                     </div>
                                 </div>
@@ -588,26 +588,26 @@
                                 <p class="subtitle">Test your green intelligence to earn extra XP and level up!</p>
                             </div>
 
-                            <div class="quiz-body" id="quiz-container">
+                            <div class="quiz-body" id="quiz-container" aria-live="polite">
                                 <!-- Step 1: Active Question -->
                                 <div id="quiz-question-view">
                                     <div class="quiz-progress-text">Question <span id="quiz-current-num">1</span> of 3</div>
-                                    <div class="quiz-progress-bar"><div id="quiz-bar-fill" style="width: 33%"></div></div>
+                                    <div class="quiz-progress-bar"><div id="quiz-bar-fill" style="width: 33%" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="33" aria-label="Quiz progress"></div></div>
                                     
                                     <h4 class="quiz-question" id="quiz-question-text">Which of the following actions typically has the single highest annual carbon saving?</h4>
                                     
-                                    <div class="quiz-options-list" id="quiz-options-list">
+                                    <div class="quiz-options-list" id="quiz-options-list" role="group" aria-label="Quiz options">
                                         <!-- Dynamic buttons generated by JS -->
                                     </div>
                                 </div>
 
                                 <!-- Step 2: Results view -->
                                 <div id="quiz-result-view" style="display: none;">
-                                    <div class="quiz-success-icon"><i data-lucide="check-circle-2"></i></div>
+                                    <div class="quiz-success-icon"><i data-lucide="check-circle-2" aria-hidden="true"></i></div>
                                     <h4>Quiz Completed!</h4>
                                     <p class="quiz-score-text">You got <span id="quiz-score">0</span> out of 3 correct!</p>
                                     <p class="quiz-xp-awarded" id="quiz-xp-awarded-text">+0 XP Earned</p>
-                                    <button class="btn btn-primary" id="btn-quiz-restart">Try Again</button>
+                                    <button class="btn btn-primary" id="btn-quiz-restart" aria-label="Restart the quiz">Try Again</button>
                                 </div>
                             </div>
                         </div>
@@ -619,8 +619,8 @@
     </div>
 
     <!-- Achievement Toast Notification -->
-    <div class="toast" id="achievement-toast">
-        <div class="toast-icon"><i data-lucide="award"></i></div>
+    <div class="toast" id="achievement-toast" aria-live="assertive" aria-atomic="true">
+        <div class="toast-icon"><i data-lucide="award" aria-hidden="true"></i></div>
         <div class="toast-content">
             <span class="toast-label">Achievement Unlocked!</span>
             <span class="toast-title" id="toast-achievement-name">Eco Pioneer</span>

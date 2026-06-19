@@ -37,12 +37,42 @@ const DEFAULT_STATE = {
 
 let userState = { ...DEFAULT_STATE };
 
+// Safe state sanitizer to prevent prototype pollution and schema mismatch
+function sanitizeState(loaded) {
+    if (!loaded || typeof loaded !== 'object') return { ...DEFAULT_STATE };
+    const clean = { ...DEFAULT_STATE };
+    
+    for (const key in DEFAULT_STATE) {
+        if (Object.prototype.hasOwnProperty.call(loaded, key) && key !== '__proto__' && key !== 'constructor') {
+            const val = loaded[key];
+            if (val !== undefined) {
+                if (typeof DEFAULT_STATE[key] === 'object' && DEFAULT_STATE[key] !== null) {
+                    if (Array.isArray(DEFAULT_STATE[key])) {
+                        clean[key] = Array.isArray(val) ? val.filter(x => typeof x !== 'function') : [...DEFAULT_STATE[key]];
+                    } else {
+                        clean[key] = { ...DEFAULT_STATE[key] };
+                        for (const subKey in DEFAULT_STATE[key]) {
+                            if (Object.prototype.hasOwnProperty.call(val, subKey) && subKey !== '__proto__' && subKey !== 'constructor') {
+                                clean[key][subKey] = val[subKey];
+                            }
+                        }
+                    }
+                } else {
+                    clean[key] = val;
+                }
+            }
+        }
+    }
+    return clean;
+}
+
 // Load state from LocalStorage
 function loadState() {
     const saved = localStorage.getItem('carbonpulse_user_state');
     if (saved) {
         try {
-            userState = { ...DEFAULT_STATE, ...JSON.parse(saved) };
+            const parsed = JSON.parse(saved);
+            userState = sanitizeState(parsed);
         } catch (e) {
             console.error("Error parsing saved state, resetting...", e);
             userState = { ...DEFAULT_STATE };
@@ -493,43 +523,92 @@ function renderActionCards(categoryFilter = 'all') {
         
         const card = document.createElement('div');
         card.className = `card action-card ${action.category}-act`;
-        
-        // Define action icons
-        let iconMarkup = `<i data-lucide="${action.icon || 'leaf'}"></i>`;
-        
-        card.innerHTML = `
-            <div class="action-main">
-                <div class="action-icon">
-                    ${iconMarkup}
-                </div>
-                <div class="action-details">
-                    <h4>${action.title}</h4>
-                    <p>${action.desc}</p>
-                    <div class="action-meta">
-                        <span class="meta-pill xp">+${action.xp} XP</span>
-                        <span class="meta-pill carbon-saving">Saves ${action.saving} kg CO₂e</span>
-                    </div>
-                </div>
-            </div>
-            <div class="action-footer">
-                ${action.type === 'habit' 
-                    ? `
-                    <div class="habit-committed-indicator">
-                        ${isCommitted ? `<i data-lucide="check-square" class="saved-icon"></i> Committed` : `<span style="color:var(--text-muted)">Not committed</span>`}
-                    </div>
-                    <button class="btn btn-sm ${isCommitted ? 'btn-secondary' : 'btn-primary'}" onclick="toggleCommitToHabit('${action.id}')">
-                        ${isCommitted ? 'Release Commit' : 'Commit to Habit'}
-                    </button>
-                    ` 
-                    : `
-                    <span></span>
-                    <button class="btn btn-sm btn-primary" onclick="logGreenAction('${action.id}')">
-                        Log Action
-                    </button>
-                    `
-                }
-            </div>
-        `;
+        card.setAttribute('tabindex', '0');
+
+        const actionMain = document.createElement('div');
+        actionMain.className = 'action-main';
+
+        const actionIcon = document.createElement('div');
+        actionIcon.className = 'action-icon';
+        const iconI = document.createElement('i');
+        iconI.setAttribute('data-lucide', action.icon || 'leaf');
+        iconI.setAttribute('aria-hidden', 'true');
+        actionIcon.appendChild(iconI);
+
+        const actionDetails = document.createElement('div');
+        actionDetails.className = 'action-details';
+
+        const h4 = document.createElement('h4');
+        h4.textContent = action.title;
+
+        const p = document.createElement('p');
+        p.textContent = action.desc;
+
+        const actionMeta = document.createElement('div');
+        actionMeta.className = 'action-meta';
+
+        const xpSpan = document.createElement('span');
+        xpSpan.className = 'meta-pill xp';
+        xpSpan.textContent = `+${action.xp} XP`;
+
+        const savingSpan = document.createElement('span');
+        savingSpan.className = 'meta-pill carbon-saving';
+        savingSpan.textContent = `Saves ${action.saving} kg CO₂e`;
+
+        actionMeta.appendChild(xpSpan);
+        actionMeta.appendChild(savingSpan);
+
+        actionDetails.appendChild(h4);
+        actionDetails.appendChild(p);
+        actionDetails.appendChild(actionMeta);
+
+        actionMain.appendChild(actionIcon);
+        actionMain.appendChild(actionDetails);
+
+        const actionFooter = document.createElement('div');
+        actionFooter.className = 'action-footer';
+
+        if (action.type === 'habit') {
+            const indicator = document.createElement('div');
+            indicator.className = 'habit-committed-indicator';
+            
+            if (isCommitted) {
+                const checkIcon = document.createElement('i');
+                checkIcon.setAttribute('data-lucide', 'check-square');
+                checkIcon.className = 'saved-icon';
+                checkIcon.setAttribute('aria-hidden', 'true');
+                indicator.appendChild(checkIcon);
+                indicator.appendChild(document.createTextNode(' Committed'));
+            } else {
+                const notCommSpan = document.createElement('span');
+                notCommSpan.style.color = 'var(--text-muted)';
+                notCommSpan.textContent = 'Not committed';
+                indicator.appendChild(notCommSpan);
+            }
+
+            const commitBtn = document.createElement('button');
+            commitBtn.className = `btn btn-sm ${isCommitted ? 'btn-secondary' : 'btn-primary'}`;
+            commitBtn.textContent = isCommitted ? 'Release Commit' : 'Commit to Habit';
+            commitBtn.setAttribute('aria-label', `${isCommitted ? 'Release commit from' : 'Commit to'} habit: ${action.title}`);
+            commitBtn.addEventListener('click', () => toggleCommitToHabit(action.id));
+
+            actionFooter.appendChild(indicator);
+            actionFooter.appendChild(commitBtn);
+        } else {
+            const spacer = document.createElement('span');
+            
+            const logBtn = document.createElement('button');
+            logBtn.className = 'btn btn-sm btn-primary';
+            logBtn.textContent = 'Log Action';
+            logBtn.setAttribute('aria-label', `Log action: ${action.title}`);
+            logBtn.addEventListener('click', () => logGreenAction(action.id));
+
+            actionFooter.appendChild(spacer);
+            actionFooter.appendChild(logBtn);
+        }
+
+        card.appendChild(actionMain);
+        card.appendChild(actionFooter);
         container.appendChild(card);
     });
     
@@ -551,15 +630,31 @@ function updateUIElements() {
         const userPercentage = Math.min(100, (total / 10.0) * 100);
         benchUserBar.style.width = userPercentage + '%';
         
-        // Dynamic status text
+        // Update benchmark description for screen readers
+        const benchBarDesc = document.getElementById('bench-bar-desc');
+        if (benchBarDesc) {
+            benchBarDesc.setAttribute('aria-label', `Footprint benchmark comparison bar. Left marker is Paris target (2.0t). Middle marker is Global average (4.5t). Your footprint position is at ${total.toFixed(1)} tonnes.`);
+        }
+        
+        // Dynamic status text securely using DOM creation to prevent innerHTML issues
+        statusMsg.textContent = '';
         if (total <= 2.0) {
-            statusMsg.innerHTML = `<span style="color:var(--success)">Fantastic!</span> Your footprint is within the sustainable global target limit.`;
+            const bold = document.createElement('strong');
+            bold.style.color = 'var(--success)';
+            bold.textContent = 'Fantastic! ';
+            statusMsg.appendChild(bold);
+            statusMsg.appendChild(document.createTextNode('Your footprint is within the sustainable global target limit.'));
             benchUserBar.style.background = 'var(--accent-gradient)';
         } else if (total <= 4.5) {
-            statusMsg.innerHTML = `Your footprint is better than the global average, but adjustments can push you under the <span style="color:var(--accent)">2.0t target</span>.`;
+            statusMsg.appendChild(document.createTextNode('Your footprint is better than the global average, but adjustments can push you under the '));
+            const span = document.createElement('span');
+            span.style.color = 'var(--accent)';
+            span.textContent = '2.0t target';
+            statusMsg.appendChild(span);
+            statusMsg.appendChild(document.createTextNode('.'));
             benchUserBar.style.background = 'linear-gradient(90deg, #10b981 0%, #f59e0b 100%)';
         } else {
-            statusMsg.innerHTML = `Your footprint is above average. Try committing to habits or reducing commuting to see immediate improvements.`;
+            statusMsg.textContent = 'Your footprint is above average. Try committing to habits or reducing commuting to see immediate improvements.';
             benchUserBar.style.background = 'linear-gradient(90deg, #f59e0b 0%, #ef4444 100%)';
         }
     } else {
@@ -579,7 +674,10 @@ function updateUIElements() {
     document.getElementById('next-level-xp').innerText = userState.level * 100;
     
     const xpPercent = (userState.xp / (userState.level * 100)) * 100;
-    document.getElementById('xp-progress').style.width = xpPercent + '%';
+    const progressBar = document.getElementById('xp-progress');
+    progressBar.style.width = xpPercent + '%';
+    progressBar.setAttribute('aria-valuenow', Math.round(xpPercent));
+    progressBar.setAttribute('aria-valuemax', '100');
 
     // 4. Monthly Goal Progress Ring
     const goalSaved = userState.monthlySaved;
@@ -594,6 +692,11 @@ function updateUIElements() {
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (goalPercent / 100) * circumference;
     circle.style.strokeDashoffset = offset;
+    
+    const progressWrapper = document.getElementById('goal-progress-wrapper');
+    if (progressWrapper) {
+        progressWrapper.setAttribute('aria-label', `Goal progress circular meter. Currently saved ${goalSaved.toFixed(1)} kg CO2e, representing ${goalPercent}% towards your ${monthlyTarget} kg monthly savings target.`);
+    }
 
     // 5. Badges
     const badgesContainer = document.getElementById('badges-container');
@@ -603,14 +706,23 @@ function updateUIElements() {
         const isUnlocked = userState.unlockedBadges.includes(badge.id);
         const item = document.createElement('div');
         item.className = `badge-item ${isUnlocked ? 'unlocked' : 'locked'}`;
-        item.title = badge.desc;
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('title', badge.desc);
+        item.setAttribute('aria-label', `Badge: ${badge.title}. Status: ${isUnlocked ? 'Unlocked' : 'Locked'}. Description: ${badge.desc}`);
         
-        item.innerHTML = `
-            <div class="badge-icon">
-                <i data-lucide="${isUnlocked ? badge.icon : 'lock'}"></i>
-            </div>
-            <div class="badge-title">${badge.title}</div>
-        `;
+        const badgeIcon = document.createElement('div');
+        badgeIcon.className = 'badge-icon';
+        const iconI = document.createElement('i');
+        iconI.setAttribute('data-lucide', isUnlocked ? badge.icon : 'lock');
+        iconI.setAttribute('aria-hidden', 'true');
+        badgeIcon.appendChild(iconI);
+        
+        const badgeTitle = document.createElement('div');
+        badgeTitle.className = 'badge-title';
+        badgeTitle.textContent = badge.title;
+        
+        item.appendChild(badgeIcon);
+        item.appendChild(badgeTitle);
         badgesContainer.appendChild(item);
     });
 
@@ -718,16 +830,23 @@ function setupStepNavigator() {
 function changeStep(targetStep) {
     // Hide current pane
     document.getElementById(`step-pane-${currentCalcStep}`).classList.remove('active');
-    document.querySelector(`.step-node[data-step="${currentCalcStep}"]`).classList.remove('active');
+    
+    const currentStepNode = document.querySelector(`.step-node[data-step="${currentCalcStep}"]`);
+    currentStepNode.classList.remove('active');
+    currentStepNode.removeAttribute('aria-current');
+    
     if (targetStep < currentCalcStep) {
-        document.querySelector(`.step-node[data-step="${currentCalcStep}"]`).classList.remove('completed');
+        currentStepNode.classList.remove('completed');
     } else {
-        document.querySelector(`.step-node[data-step="${currentCalcStep}"]`).classList.add('completed');
+        currentStepNode.classList.add('completed');
     }
 
     // Show target pane
     document.getElementById(`step-pane-${targetStep}`).classList.add('active');
-    document.querySelector(`.step-node[data-step="${targetStep}"]`).classList.add('active');
+    
+    const targetStepNode = document.querySelector(`.step-node[data-step="${targetStep}"]`);
+    targetStepNode.classList.add('active');
+    targetStepNode.setAttribute('aria-current', 'step');
     
     currentCalcStep = targetStep;
 
@@ -737,10 +856,20 @@ function changeStep(targetStep) {
 
     btnPrev.disabled = (currentCalcStep === 1);
     
+    // Clean, secure DOM manipulation to avoid innerHTML variables issues on buttons
+    btnNext.textContent = '';
     if (currentCalcStep === totalCalcSteps) {
-        btnNext.innerHTML = `Finish <i data-lucide="check"></i>`;
+        btnNext.appendChild(document.createTextNode('Finish '));
+        const checkIcon = document.createElement('i');
+        checkIcon.setAttribute('data-lucide', 'check');
+        checkIcon.setAttribute('aria-hidden', 'true');
+        btnNext.appendChild(checkIcon);
     } else {
-        btnNext.innerHTML = `Next <i data-lucide="arrow-right"></i>`;
+        btnNext.appendChild(document.createTextNode('Next '));
+        const arrowIcon = document.createElement('i');
+        arrowIcon.setAttribute('data-lucide', 'arrow-right');
+        arrowIcon.setAttribute('aria-hidden', 'true');
+        btnNext.appendChild(arrowIcon);
     }
     
     lucide.createIcons();
@@ -760,15 +889,28 @@ function setupSimulator() {
         const valThermo = Number(sliderThermo.value);
         const valAppliances = Number(sliderAppliances.value);
 
-        // Update labels
-        document.getElementById('sim-val-commute').innerText = `${valCommute}% less driving`;
-        document.getElementById('sim-val-meat').innerText = `${valMeat} days / week`;
-        document.getElementById('sim-val-thermo').innerText = `${valThermo}°C reduction`;
+        // Update labels and ARIA values
+        const txtCommute = `${valCommute}% less driving`;
+        document.getElementById('sim-val-commute').innerText = txtCommute;
+        sliderCommute.setAttribute('aria-valuenow', valCommute);
+        sliderCommute.setAttribute('aria-valuetext', txtCommute);
+        
+        const txtMeat = `${valMeat} days / week`;
+        document.getElementById('sim-val-meat').innerText = txtMeat;
+        sliderMeat.setAttribute('aria-valuenow', valMeat);
+        sliderMeat.setAttribute('aria-valuetext', txtMeat);
+        
+        const txtThermo = `${valThermo}°C reduction`;
+        document.getElementById('sim-val-thermo').innerText = txtThermo;
+        sliderThermo.setAttribute('aria-valuenow', valThermo);
+        sliderThermo.setAttribute('aria-valuetext', txtThermo);
         
         let appLabel = 'Standard efficiency';
         if (valAppliances === 1) appLabel = 'LED Upgrade';
         if (valAppliances === 2) appLabel = 'Energy Star';
         document.getElementById('sim-val-appliances').innerText = appLabel;
+        sliderAppliances.setAttribute('aria-valuenow', valAppliances);
+        sliderAppliances.setAttribute('aria-valuetext', appLabel);
 
         // Base values (falls back to defaults if calculator not finished)
         const base = userState.hasCompletedCalculator 
@@ -832,10 +974,14 @@ function setupTabNavigation() {
         btn.addEventListener('click', () => {
             const targetTab = btn.getAttribute('data-tab');
             
-            navButtons.forEach(b => b.classList.remove('active'));
+            navButtons.forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
             panels.forEach(p => p.classList.remove('active'));
 
             btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
             const targetPanel = document.getElementById(`tab-${targetTab}`);
             targetPanel.classList.add('active');
 
@@ -873,8 +1019,12 @@ function setupTabNavigation() {
     const filterButtons = document.querySelectorAll('.filter-btn');
     filterButtons.forEach(fBtn => {
         fBtn.addEventListener('click', () => {
-            filterButtons.forEach(b => b.classList.remove('active'));
+            filterButtons.forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
             fBtn.classList.add('active');
+            fBtn.setAttribute('aria-selected', 'true');
             renderActionCards(fBtn.getAttribute('data-filter'));
         });
     });
@@ -901,11 +1051,17 @@ function setupAccordion() {
             document.querySelectorAll('.accordion-item').forEach(i => {
                 i.classList.remove('active');
                 i.querySelector('.accordion-content').style.maxHeight = '0px';
+                
+                const t = i.querySelector('.accordion-trigger');
+                if (t) t.setAttribute('aria-expanded', 'false');
             });
 
             if (!isActive) {
                 item.classList.add('active');
                 content.style.maxHeight = content.scrollHeight + "px";
+                trigger.setAttribute('aria-expanded', 'true');
+            } else {
+                trigger.setAttribute('aria-expanded', 'false');
             }
         });
     });
@@ -1003,12 +1159,17 @@ function handleQuizAnswer(isCorrect, selectedBtn) {
         });
     }
 
-    // Add explanation card dynamically below
+    // Add explanation card dynamically below securely using DOM creation to prevent innerHTML issues
     const expl = document.createElement('div');
     expl.className = 'metric-status-msg';
     expl.style.marginTop = '15px';
     expl.style.borderLeftColor = isCorrect ? 'var(--success)' : 'var(--danger)';
-    expl.innerHTML = `<strong>${isCorrect ? 'Correct!' : 'Incorrect.'}</strong> ${qData.explanation}`;
+    
+    const strong = document.createElement('strong');
+    strong.textContent = isCorrect ? 'Correct! ' : 'Incorrect. ';
+    expl.appendChild(strong);
+    
+    expl.appendChild(document.createTextNode(qData.explanation));
     document.getElementById('quiz-options-list').appendChild(expl);
 
     // Next question trigger after 3.5s delay
